@@ -1,0 +1,5 @@
+<zimletConfig name="ca_uoguelph_rest_portlet" version="1.0">
+  <global>
+    <property name="portletName">Hello, World!</property>
+  </global>
+</zimletConfig>

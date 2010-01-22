@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+
+<project name="rest-remote-portlet" default="compile" basedir=".">
+
+  <property file="${user.home}/build.properties" />
+  <property file="build.properties" />
+
+  <property name="app.name" value="${ant.project.name}" />
+  <property name="app.path" value="/${app.name}" />
+  <property name="app.version" value="0.1" />
+
+  <property name="build.dir" value="${basedir}/build" />
+  <property name="dist.dir"  value="${basedir}/dist" />
+  <property name="docs.dir"  value="${basedir}/docs" />
+  <property name="src.dir"   value="${basedir}/src" />
+  <property name="lib.dir"   value="${basedir}/lib" />
+  <property name="dest.dir"  value="${build.dir}/classes" />
+  <property name="web.dir"   value="${basedir}/web" />
+  <property name="data.dir"  value="${basedir}/data" />
+
+  <property name="res.dir"   
+    value="${src.dir}/ca/uoguelph/ccs/portal/rest/resources"/>
+
+  <property name="classpath.extension" value="" />
+
+  <property name="compile.debug" value="true" />
+  <property name="compile.deprecation" value="false" />
+  <property name="compile.optimize" value="true" />
+
+  <path id="compile.classpath">
+    <!-- Include all JAR files that will be included in /WEB-INF/lib -->
+    <fileset dir="${basedir}/lib">
+      <include name="**/*.jar" />
+    </fileset>
+    <!-- Include all elements that Tomcat exposes to applications -->
+    <pathelement location="${server.home}/common/classes" />
+    <fileset dir="${server.home}/endorsed">
+      <include name="*.jar" />
+    </fileset>
+    <fileset dir="${server.home}/lib">
+      <include name="*.jar" />
+    </fileset>
+    <pathelement location="${dest.dir}" />
+    <pathelement path="${classpath.extension}" />
+  </path>
+
+  <target name="all" depends="clean,compile" 
+          description="Clean build and dist directories, then compile"
+          >
+  </target>
+
+  <target name="clean" 
+          description="Delete old build and dist directories"
+          >
+    <delete dir="${build.dir}" quiet="true" />
+    <delete dir="${dist.dir}" quiet="true" />
+  </target>
+
+  <target name="compile" depends="" 
+          description="Compile Java sources"
+          >
+    <mkdir dir="${dest.dir}" />
+    <javac srcdir="${src.dir}" destdir="${dest.dir}" 
+           debug="${compile.debug}" deprecation="${compile.deprecation}" 
+           optimize="${compile.optimize}" target="1.4">
+      <classpath refid="compile.classpath" />
+      <compilerarg value="-Xlint" compiler="javac1.4" />
+    </javac>
+    <copy todir="${dest.dir}">
+      <fileset dir="${src.dir}" excludes="**/*.java"/>
+    </copy>
+  </target>
+
+  <target name="dist" depends="compile" 
+          description="Create binary distribution"
+          >
+    <mkdir dir="${dist.dir}"/>
+    <!-- Copy documentation subdirectories -->
+    <mkdir dir="${dist.dir}/docs" />
+    <copy todir="${dist.dir}/docs">
+      <fileset dir="${docs.dir}" />
+    </copy>
+    <!-- Create JAR file -->
+    <jar jarfile="${dist.dir}/${app.name}.jar"
+         basedir="${dest.dir}"/>
+    <!-- Create WAR file -->
+    <jar jarfile="${dist.dir}/RESTPortlet.war" 
+         basedir="${web.dir}" />
+  </target>
+
+  <target name="javadoc" depends="compile" 
+          description="Create Javadoc API documentation"
+          >
+    <mkdir dir="${dist.dir}/docs/api" />
+    <javadoc sourcepath="${src.dir}" 
+             destdir="${dist.dir}/docs/api"
+             packagenames="*" access="private">
+      <classpath refid="compile.classpath" />
+    </javadoc>
+  </target>
+
+  <target name="deploy" depends="dist" 
+          description="Deploy application to servlet container"
+          >
+    <copy todir="${server.home}/shared/lib"
+          file="${dist.dir}/${app.name}.jar"/>
+  </target>
+
+  <target name="errpages">
+    <mkdir dir="${res.dir}"/>
+    <antcall target="errpage"><param name="code" value="0"/></antcall>
+    <antcall target="errpage"><param name="code" value="400"/></antcall>
+    <antcall target="errpage"><param name="code" value="401"/></antcall>
+    <antcall target="errpage"><param name="code" value="402"/></antcall>
+    <antcall target="errpage"><param name="code" value="403"/></antcall>
+    <antcall target="errpage"><param name="code" value="404"/></antcall>
+    <antcall target="errpage"><param name="code" value="405"/></antcall>
+    <antcall target="errpage"><param name="code" value="406"/></antcall>
+    <antcall target="errpage"><param name="code" value="407"/></antcall>
+    <antcall target="errpage"><param name="code" value="408"/></antcall>
+    <antcall target="errpage"><param name="code" value="409"/></antcall>
+    <antcall target="errpage"><param name="code" value="410"/></antcall>
+    <antcall target="errpage"><param name="code" value="411"/></antcall>
+    <antcall target="errpage"><param name="code" value="412"/></antcall>
+    <antcall target="errpage"><param name="code" value="413"/></antcall>
+    <antcall target="errpage"><param name="code" value="414"/></antcall>
+    <antcall target="errpage"><param name="code" value="415"/></antcall>
+    <antcall target="errpage"><param name="code" value="416"/></antcall>
+    <antcall target="errpage"><param name="code" value="500"/></antcall>
+    <antcall target="errpage"><param name="code" value="501"/></antcall>
+    <antcall target="errpage"><param name="code" value="502"/></antcall>
+    <antcall target="errpage"><param name="code" value="503"/></antcall>
+    <antcall target="errpage"><param name="code" value="504"/></antcall>
+    <antcall target="errpage"><param name="code" value="505"/></antcall>
+    <antcall target="errpage"><param name="code" value="509"/></antcall>
+  </target>
+
+  <target name="errpage">
+    <copy tofile="${res.dir}/${code}.html" file="${data.dir}/error.html" />
+    <replace file="${res.dir}/${code}.html"
+             propertyFile="${data.dir}/http.properties">
+      <replacefilter token="@code@" value="${code}"/>
+      <replacefilter token="@mesg@" property="http.${code}.mesg"/>
+      <replacefilter token="@desc@" property="http.${code}.desc"/>
+    </replace>
+  </target>
+
+</project>

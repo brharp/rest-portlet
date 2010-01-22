@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet-app 
+    xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/portlet/portlet-app_1_0.xsd 
+                        /opt/SUNWportal/dtd/portlet.xsd"
+    version="1.0">
+
+  <portlet>
+    <portlet-name>JSP</portlet-name>
+    <portlet-class>
+      ca.uoguelph.ccs.portal.rest.RestRemotePortlet
+    </portlet-class>
+    <expiration-cache>30</expiration-cache>
+    <supports>
+      <mime-type>text/html</mime-type>
+      <portlet-mode>view</portlet-mode>
+      <portlet-mode>edit</portlet-mode>
+      <portlet-mode>help</portlet-mode>
+    </supports>
+    <supported-locale>en_US</supported-locale>
+    <portlet-info>
+      <title>REST Snoop (JSP version)</title>
+      <short-title>RESTSnoopJSP</short-title>
+    </portlet-info> 
+    <init-param>
+      <name>endpoint</name>
+      <value>@jsp.endpoint@</value>
+    </init-param>
+  </portlet>
+
+  <portlet>
+    <portlet-name>SAS</portlet-name>
+    <portlet-class>
+      ca.uoguelph.ccs.portal.rest.RestRemotePortlet
+    </portlet-class>
+    <expiration-cache>30</expiration-cache>
+    <supports>
+      <mime-type>text/html</mime-type>
+      <portlet-mode>view</portlet-mode>
+      <portlet-mode>edit</portlet-mode>
+      <portlet-mode>help</portlet-mode>
+    </supports>
+    <supported-locale>en_US</supported-locale>
+    <portlet-info>
+      <title>REST Snoop (SAS version)</title>
+      <short-title>RESTSnoopSAS</short-title>
+    </portlet-info> 
+    <init-param>
+      <name>endpoint</name>
+      <value>@sas.endpoint@</value>
+    </init-param>
+    <init-param>
+      <name>x-parameter-string</name>
+      <value>@sas.extparam@</value>
+    </init-param>
+  </portlet>   
+
+  <portlet>
+    <portlet-name>PHP</portlet-name>
+    <portlet-class>
+      ca.uoguelph.ccs.portal.rest.RestRemotePortlet
+    </portlet-class>
+    <expiration-cache>30</expiration-cache>
+    <supports>
+      <mime-type>text/html</mime-type>
+      <portlet-mode>view</portlet-mode>
+      <portlet-mode>edit</portlet-mode>
+      <portlet-mode>help</portlet-mode>
+    </supports>
+    <supported-locale>en_US</supported-locale>
+    <portlet-info>
+      <title>REST Snoop (PHP version)</title>
+      <short-title>SnoopPHP</short-title>
+    </portlet-info> 
+    <init-param>
+      <name>endpoint</name>
+      <value>@php.endpoint@</value>
+    </init-param>
+  </portlet>   
+
+  <user-attribute><name>username</name></user-attribute>
+  <user-attribute><name>lastName</name></user-attribute>
+  <user-attribute><name>firstName</name></user-attribute>
+  <user-attribute><name>mail</name></user-attribute>
+  <user-attribute><name>displayName</name></user-attribute>
+  <user-attribute><name>uPortalTemplateUserName</name></user-attribute>
+  <user-attribute><name>userRole</name></user-attribute>
+  <user-attribute><name>classLevel</name></user-attribute>
+  <user-attribute><name>academicStanding</name></user-attribute>
+  <user-attribute><name>academicStart</name></user-attribute>
+  <user-attribute><name>academicStatus</name></user-attribute>
+  <user-attribute><name>commonName</name></user-attribute>
+  <user-attribute><name>coop</name></user-attribute>
+  <user-attribute><name>degree</name></user-attribute>
+  <user-attribute><name>academiclevel</name></user-attribute>
+  <user-attribute><name>departmentName</name></user-attribute>
+  <user-attribute><name>studentLoad</name></user-attribute>
+  <user-attribute><name>program</name></user-attribute>
+  <user-attribute><name>programDept</name></user-attribute>
+  <user-attribute><name>programMajor</name></user-attribute>
+  <user-attribute><name>programMinor</name></user-attribute>
+  <user-attribute><name>programSchool</name></user-attribute>
+  <user-attribute><name>programSpec</name></user-attribute>
+  <user-attribute><name>publish</name></user-attribute>
+  <user-attribute><name>term</name></user-attribute>
+  <user-attribute><name>uogcourses</name></user-attribute>
+  <user-attribute><name>campus</name></user-attribute>
+  <user-attribute><name>uoginstructor</name></user-attribute>
+  <user-attribute><name>studentId</name></user-attribute>
+  <user-attribute><name>employeeId</name></user-attribute>
+  <user-attribute><name>mailhost</name></user-attribute>
+  <!--user-attribute><name>password</name></user-attribute-->
+</portlet-app>

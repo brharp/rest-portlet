@@ -1,0 +1,31 @@
+REST Remote Portlet
+===================
+
+*This document is a work in progress.*
+
+An implementation of the REST portlet specification as a JSR-168
+portlet.
+
+
+
+## Error Handling
+
+Errors may occur in the remote portlet, or in the portal either due to
+programming errors or misconfiguration.
+
+Errors in the remote portlet are generally reported through an
+appropriate HTTP response code. However, the error pages configured
+for most servers (404 not found, etc) will not generally be suitable
+for consumption by the portal (they will contain header and footer
+sections, for example). The remote portlet provides error pages for
+common HTTP error codes that work properly within the portal context.
+
+Errors in the portal due to misconfiguration result in a suitably
+precise exception being thrown. These exceptions trigger an error page
+that describes the problem in detail and aims to help resolve the
+misconfiguration.
+
+Unexpected errors due to programming bugs or unrecoverable situations
+result in a general exception, which triggers an all-purpose error
+page. This error page may contain general or technical information
+that may only be of significance to the portal developer.

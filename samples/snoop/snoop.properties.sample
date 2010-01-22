@@ -1,0 +1,3 @@
+jsp.endpoint=http://www.example.com/snoop.jsp
+php.endpoint=http://www.example.com/snoop.php
+sas.endpoint=http://www.example.com/snoop.sas

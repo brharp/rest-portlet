@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<project name="rest-portlet" default="dist" basedir=".">
+
+  <property file="${user.home}/build.properties" />
+  <property file="build.properties" />
+
+  <property name="app.name" value="${ant.project.name}" />
+  <property name="dist.home" value="${basedir}/dist" />
+  <property name="web.home" value="${basedir}/web" />
+  <property name="build.home" value="${basedir}/build" />
+  <property name="name" value="simple"/>
+
+  <target name="clean" description="Delete old build and dist directories">
+    <delete dir="${build.home}" quiet="true" />
+  </target>
+
+  <target name="prepare" depends="clean">
+    <mkdir dir="${build.home}"/>
+    <copy todir="${build.home}">
+      <fileset dir="${web.home}"/>
+      <filterset filtersfile="${name}.properties"/>
+    </copy>
+  </target>
+
+  <target name="dist" depends="prepare" 
+          description="Create binary distribution">
+    <!-- Create application WAR file -->
+    <mkdir dir="${dist.home}"/>
+    <jar jarfile="${dist.home}/${name}.war" basedir="${build.home}" />
+  </target>
+  
+</project>

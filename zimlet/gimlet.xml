@@ -1,0 +1,21 @@
+<zimlet name="gimlet" version="1.0" description="Gimlet">
+     <include>gimlet.js</include>
+     <resource>snoop.jsp</resource>
+     <handlerObject>GimletHandlerObject</handlerObject>
+     <zimletPanelItem label="${msg.gimletName}">
+     </zimletPanelItem>
+<userProperties>
+    <property type="string" label="Your username" name="my_test_username" />
+    <property type="password" label="Your password" name="my_test_password" />
+    <property type="number" label="Your ID number" name="my_test_id_num" />
+    <property type="date" label="Delivery Date" name="my_test_delivery_date" />
+    <property type="boolean" label="Priority?" name="my_test_priority" />
+    <property type="enum" label="Shapes" name="my_test_shapes">
+        <item label="Square" value="square"/>
+        <item label="Circle" value="circle"/>
+        <item label="Rectangle" value="rectangle"/>
+    </property>
+</userProperties>
+
+</zimlet>
+

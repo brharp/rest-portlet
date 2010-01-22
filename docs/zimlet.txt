@@ -1,0 +1,17 @@
+
+REST Portlet is integrated with the Zimbra Zimlet API. 
+
+Portlet requests are handled by render.jsp and processAction.jsp. The JSP 
+files invoke Java classes to proxy requests to the remote portlet, 
+and transform the results into a format suitable for the Zimlet.
+
+Portlet scheme URLs are transformed into javascript: URLs that call the 
+render() and processAction() methods.  These methods submit new 
+asynchronous requests to the remote portlet and replace the window
+contents dynamically.  The only exceptions are form actions: these
+are rewritten to submit the form data in an onSubmit Javascript handler,
+which must return false to prevent regular form submission (which would
+replace the top level frame.)
+
+
+

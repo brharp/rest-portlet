@@ -1,0 +1,238 @@
+<h1>REST Portlet</h1>
+
+<h2>Introduction</h2>
+
+<p>REST Portlet is a technology-neutral adaptation of the Java Portlet
+API. It is a protocol extension of HTTP that allows portlets to be
+written in any programming language that can read and write HTTP
+headers.</p>
+
+<p>These pages describe the <a href="spec.html">protocol specification</a> as well
+as an implementation of the protocol as a JSR-168 portlet.</p>
+
+<p>Please direct any questions or comments to <a href="m&#97;&#105;&#x6C;&#x74;&#x6F;:&#98;r&#x68;&#x61;&#x72;&#x70;&#64;&#x75;&#111;&#103;&#x75;&#x65;&#x6C;&#112;&#x68;&#x2E;&#x63;&#x61;">&#98;r&#x68;&#x61;&#x72;&#x70;&#64;&#x75;&#111;&#103;&#x75;&#x65;&#x6C;&#112;&#x68;&#x2E;&#x63;&#x61;</a>.</p>
+
+<h2>Overview</h2>
+
+<p>REST Portlet is a direct mapping of the Java Portlet API to features
+of HTTP. The portal communicates with a REST portlet through a series
+of HTTP requests. The REST portlet can get information about its state
+by reading extended HTTP headers, and may modify its state by writing
+HTTP headers.</p>
+
+<pre><code>            X-Portlet-Method: view
+            X-Portlet-Mode: normal
+            X-Portlet-State: edit
+              .
+              .
+              .
++--------+               +---------+
+|        | ------------&gt; |         |
+| Portal |      HTTP     | Portlet |
+|        | &lt;------------ |         |
++--------+               +---------+
+                     .
+                     .
+                     .
+            X-Portlet-Set-Mode: view
+            X-Portlet-Set-Preference: colour=red
+</code></pre>
+
+<p>This arrangement allows any program that can read and write HTTP
+headers to implement a full featured portlet.</p>
+
+<h2>Getting Started</h2>
+
+<p>The only requirement for implementing a REST portlet is responding to
+an HTTP GET request. In fact, a static HTML page is a valid (albeit
+boring) REST portlet. Given that, the "Hello, World" of REST portlets
+is the following.</p>
+
+<pre><code>hello.html
+
+&lt;p&gt;Hello, World!&lt;/p&gt;
+</code></pre>
+
+<p>However, as we mentioned, that is not a very interesting example. To
+do more, we will need to replace our static HTML with dynamically
+generated content. To keep things simple, let's consider the following
+shell CGI program.</p>
+
+<pre><code>hello.cgi
+
+#!/bin/sh
+cat &lt;&lt;HTML
+Content-type: text/html
+
+&lt;P&gt;Hello, ${HTTP_X_PORTLET_REMOTE_USER}&lt;/P&gt;
+HTML
+</code></pre>
+
+<p>Which produces the following output.</p>
+
+<pre><code>Hello, brharp
+</code></pre>
+
+<p>Still not too exciting, but as you can see we have customized the
+output based on an HTTP header, in this case <code>X-Portlet-Remote-User</code>.</p>
+
+<p>This simple interaction demonstrates the underlying principle of REST
+portlets---reading HTTP headers and generating a dynamic response.</p>
+
+<h2>More Headers - Portlet Mode and Window State</h2>
+
+<p>Unlike standard web applications, portlets may be in one of several
+<em>modes</em>. For example, a portlet may provide an "edit" mode that allows
+for user customization, typically by filling out and submitting a form. A
+REST portlet may determine the current mode by inspecting the value of
+<code>X-Portlet-Portlet-Mode</code> request header. The value will be one of:</p>
+
+<ul>
+<li>view</li>
+<li>edit</li>
+<li>help</li>
+</ul>
+
+<p>or a custom mode defined in the portlet deployment file.</p>
+
+<p>Portlets are rendered inside of a portlet window which, like in desktop
+windowing environments can be minimized or maximized. A REST portlet may
+choose to alter its layout when maximized to take advantage of the full
+browser window, or it might not render anything at all when minimized
+(except perhaps to set the window title.) A REST portlet can determine the
+current window state by examining the value of the <code>X-Portlet-Window-State</code> 
+header. The window state will be one of:</p>
+
+<ul>
+<li>normal</li>
+<li>maximized</li>
+<li>minimized</li>
+</ul>
+
+<p>or a custom mode supported by the portal.</p>
+
+<h2>Portlet Preferences</h2>
+
+<p>Portlet preferences are a simple key-value database stored between 
+portal sessions. Each portlet sees a unique map of preference values.
+Although not a replacement for a general purpose database, preferences
+are a convenient place to store configuration data in the portal.</p>
+
+<p>Preferences are set from a REST portlet by sending the 
+<code>X-Portlet-Set-Preference</code> reply  header back to the portal in 
+response to a <code>processAction</code> request. The preference headers are
+"cookie encoded": that is, like HTTP cookies, preferences are encoded as a 
+series of </p>
+
+<pre><code>key=value
+</code></pre>
+
+<p>pairs, separated by semi-colons (;). Previously set preferences are 
+passed to the REST portlet by the portal for each portlet request,
+in the familiar</p>
+
+<pre><code>key1=value1; key2=value2;
+</code></pre>
+
+<p>format. For example, to set preferences for foreground and background
+colours, we would send the following header to the portal in response
+to a <code>processAction</code> request:</p>
+
+<pre><code>X-Portlet-Set-Preference: background=black; foreground=white
+</code></pre>
+
+<p>and the portal would return the following header with each portlet request:</p>
+
+<pre><code>X-Portlet-Preference: background=black; foreground=white
+</code></pre>
+
+<h2>Portlet URLs</h2>
+
+<p>Self referential URLs must be generated by the portlet container. The
+portlet API provides methods to generate self referential URLs that 
+trigger a refresh of the portlet window, change the portlet mode or 
+window state, or set additional request parameters.</p>
+
+<p>Portlet URLs may be generated from REST portlets by emitting URLs
+in the special "portlet:" scheme. Portlet scheme URLs are translated
+by the portlet stub running in the portlet container, which has 
+access to the full portlet API for generating URLs expected by the 
+portlet container.</p>
+
+<p>The general format of a "portlet:" scheme URL is:</p>
+
+<p>portlet:(render|processAction)[;mode=(view|edit|help|...)]
+    [;state=(normal|maximized|minimized|...)]
+    [;secure=(true|false)]
+    [?(name=value)*]</p>
+
+<p>Some examples of portlet URLs are:</p>
+
+<p>A render URL -</p>
+
+<pre><code>&lt;a href="portlet:render"&gt;refresh&lt;/a&gt;
+</code></pre>
+
+<p>A render URL with parameters -</p>
+
+<pre><code>&lt;a href="portlet:render?show=all"&gt;Expand&lt;/a&gt;
+</code></pre>
+
+<p>A render URL that maximizes the window -</p>
+
+<pre><code>&lt;a href="portlet:render;state=maximized"&gt;Maximize&lt;/a&gt;
+</code></pre>
+
+<p>A form submission that returns the user to "view" mode -</p>
+
+<pre><code>&lt;form action="portlet:processAction;mode=view" method="post"&gt;
+    &lt;input name="foo"&gt;&lt;/input&gt;
+    &lt;input type="submit"/&gt;
+&lt;/form&gt;
+</code></pre>
+
+<h2>Render Parameters</h2>
+
+<p>Portal pages have an action phase and a render phase: the action 
+phase targets a single portlet, while the render phase includes
+every portlet on the page. A render request can come in isolation,
+but a process action request is always followed by a render request.</p>
+
+<p>Since the process action request can not generate any output, it's
+common to pass data forward from the process action phase to the 
+render phase as <em>render parameters</em>, instead of cluttering the 
+session or preference name spaces with temporary variables. Render 
+parameters are set in response to a <code>processAction</code> request,
+and live only as long as the next <code>render</code> request.</p>
+
+<p>To set a render parameter, send the <code>X-Portlet-Set-Render-Parameter</code>. 
+Render parameters are passed to the REST portlet in the 
+query string a a <code>render</code> request.</p>
+
+<h2>User Info</h2>
+
+<p>One feature of a portal is access to user information, such as
+attributes commonly found in a directory. Portals expose selected
+user information to portlets via the user info map. REST portlets
+have access to the user info map via the <code>X-Portlet-User-Info</code>
+request header. Like preferences, the user info header is 
+"cookie encoded" key=value pairs, separated by a semi-colon and
+a space. The user info header is sent with all portlet requests.</p>
+
+<h2>Portlet Namespace</h2>
+
+<p>Portlets share the page and must be careful to give unique 
+identifiers to DOM elements. The portlet provides a unique
+namespace to each portlet instance, which is passed to REST
+portlets via the <code>X-Portlet-Namespace</code> request header. Portlets
+that generate HTML elements with an ID attribute or JavaScript
+functions and variables must take care to prefix these identifiers
+with the portlet namespace value.</p>
+
+<h2>Conclusion</h2>
+
+<p>REST portlet provides a simple protocol for programs deployed 
+beyond the portal server, and written not necessarily in Java,
+to participate in the portal framework. As much of the portlet
+API as possible is exposed to REST portlets in HTTP request
+and response headers, allowing for tight portal integration.</p>
