@@ -659,7 +659,7 @@ public abstract class Header
 
     /* Header Enumeration */
 
-    protected static Header[] responseHeaders =
+    public static Header[] responseHeaders =
         new Header[] {
             ContentLength,
             ContentType,
