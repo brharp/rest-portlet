@@ -4,24 +4,21 @@ GimletHandlerObject.prototype.constructor = GimletHandlerObject;
 
 baseURI = "baseURI:";
 
-function resolveURI (relativeURI, baseURI) {
+GimletHandlerObject.prototype.resolveURI =
+function  (relativeURI, baseURI) {
   if (relativeURI.indexOf(":") < 0) {
     uri = baseURI + relativeURI;
   } else {
     uri = relativeURI;
   }
   if (uri.indexOf("portlet:") == 0) {
-    return createPortletURL(uri);
+    return this.createPortletURL(uri);
   } else {
     return uri;
   }
 }
 
 
-function createURL (method, mode, state, secure, params) {
-  return "javascript:"+method+"(\""+mode+"\",\""+state+"\",\""+secure+"\","
-             +params+")";
-}
 
 function PortletMode () {}
 PortletMode.VIEW = "view";
@@ -37,8 +34,9 @@ WindowState.NORMAL = "normal";
 // In a Zimlet, portlet: scheme URIs are implemented
 // as javascript: URIs that call one of render() or 
 // or processAction.
-GimletHandlerObject
-function createPortletURL (uri) {
+GimletHandlerObject.prototype.createPortletURL =
+function (uri) {
+  var id = this.id;
   var method;
   var mode = PortletMode.VIEW;
   var state = WindowState.NORMAL;
@@ -80,7 +78,15 @@ function createPortletURL (uri) {
       }
     }
   }
-  return createURL(method,mode,state,secure,"{"+parameters.join(",")+"}");
+  return this.createURL(method,mode,state,secure,query);
+}
+
+GimletHandlerObject.prototype.createURL =
+function (method, mode, state, secure, params) {
+  var id = this.id;
+  return "javascript:"+method+
+            "("+id+",\""+mode+"\",\""+state+"\",\""+secure+"\",\""
+             +params+"\")";
 }
 
 GimletHandlerObject.prototype.singleClicked =
@@ -96,7 +102,7 @@ function (canvas) {
   var title = this.getMessage("gimletName");
   canvas = this._createDialog({view: view, title: title});
   canvas.view = view;
-  this.render("view", "normal", true, {});
+  this.render(this.id, "view", "normal", true, {});
   canvas.popup(); 
   return canvas;
 };
@@ -105,7 +111,8 @@ GimletHandlerObject.prototype.render =
 function (mode,state,secure,params) {
   // Get content.
   var req = new XMLHttpRequest();
-  req.open("GET", this.getResource("snoop.jsp"), false);
+  var url = this.getResource("snoop.jsp");
+  req.open("GET", params.length > 0 ? url+"?"+params : url , false);
   req.setRequestHeader("X-Portlet-Method", "render");
   req.setRequestHeader("X-Portlet-Auth-Type", "password");
   req.setRequestHeader("X-Portlet-Context-Path", this.getResource(""));
@@ -146,7 +153,7 @@ function (mode,state,secure,params) {
         for (var k = 0; k < attrs.length; k++) {
           if (e.hasAttribute(attrs[k])) {
             var a = e.getAttribute(attrs[k]);
-            e.setAttribute(attrs[k], resolveURI(a));
+            e.setAttribute(attrs[k], this.resolveURI(a));
           }
         }
       }
@@ -154,8 +161,16 @@ function (mode,state,secure,params) {
   }
 }
 
-GimletHandlerObject.prototype.init =
+GimletHandlerObject.prototype.init = 
 function () {
-  this.namespace = "G" + (Math.random() * 10);
-  GimletHandlerObject[this.namespace] = this;
+  this.id = GimletHandlerObject.nextId++;
+  GimletHandlerObject.registry[this.id] = this;
+};
+
+GimletHandlerObject.nextId = 0;
+GimletHandlerObject.registry = [];
+
+
+function render (id,mode,state,secure,params) {
+  GimletHandlerObject.registry[id].render(mode,state,secure,params);
 }
