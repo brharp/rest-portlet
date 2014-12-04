@@ -63,6 +63,8 @@ class RenderMethod extends PortletRequestMethod
      * @param endpoint a REST portlet endpoint.
      */
     void execute (RestRemotePortlet portlet,
+
+
                   XMLHttpRequestObject transport,
                   Endpoint endpoint)
         throws IOException, 
